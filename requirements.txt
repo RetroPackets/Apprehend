@@ -1,0 +1,5 @@
+pyqt5
+datetime
+capture
+colorama
+tk
