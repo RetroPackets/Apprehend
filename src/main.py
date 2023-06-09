@@ -200,52 +200,60 @@ class snifferGui(QtWidgets.QMainWindow):
 
 			pack = packet_queue.get()
 			eth = Ethernet(pack)
-			
+
 			# IPv4
 			if eth.proto == 8:
 				ipv4 = IPv4(eth.data)
 				item = QtWidgets.QTreeWidgetItem(self.treeWidget, [str(datetime.now().strftime('%H:%M:%S')), str(self.packetCount), ipv4.src, ipv4.target, ipv4.next_proto])
-				sys.stdout.write("\n\n\nPacket #{}\tPacket Length: {}\n".format(self.packetCount,eth.pac_len))
-				sys.stdout.write("{}\n\nSource MAC: {}\tDestination MAC: {}\tNetwork Protocol:IPv4  \tTransport Protocol: {}\n{}\n\n".format(ethFrame,eth.src_mac,eth.dest_mac,ipv4.next_proto,sep1))
+				sys.stdout.write(
+					f"\n\n\nPacket #{self.packetCount}\tPacket Length: {eth.pac_len}\n"
+				)
+				sys.stdout.write(
+					f"{ethFrame}\n\nSource MAC: {eth.src_mac}\tDestination MAC: {eth.dest_mac}\tNetwork Protocol:IPv4  \tTransport Protocol: {ipv4.next_proto}\n{sep1}\n\n"
+				)
 				self.packetCount += 1
 				# ICMP
 				if ipv4.proto == 1:
 					icmp = ICMP(ipv4.data)
-					sys.stdout.write("Type: {} \t Code: {} \t Checksum: {}\n{}\n".format(icmp.type,icmp.code,icmp.checksum,sep1))
+					sys.stdout.write(
+						f"Type: {icmp.type} \t Code: {icmp.code} \t Checksum: {icmp.checksum}\n{sep1}\n"
+					)
 					try:
-						sys.stdout.write("ICMP data:\n{}\n{}\n".format(icmp.data.decode('utf-8'),sep1))
+						sys.stdout.write(f"ICMP data:\n{icmp.data.decode('utf-8')}\n{sep1}\n")
 					except UnicodeDecodeError:
 						pass
-				
-				# TCP
+
 				elif ipv4.proto == 6:
 					tcp = TCP(ipv4.data)
-					sys.stdout.write("Source Port: {} \t Destination Port: {} \t Sequence: {}\t Acknowledgment: {}\n\nFlags: \tURG: {} \t ACK: {} \t PSH: {} \t RST: {} \t SYN: {} \t FIN:{}\n{}\n".format(tcp.src_port,tcp.dest_port,tcp.sequence,tcp.acknowledgment,tcp.flag_URG, tcp.flag_ACK,tcp.flag_PSH,tcp.flag_RST,tcp.flag_SYN,tcp.flag_FIN,sep1))
-					if len(tcp.data) > 0:
-						if tcp.src_port == 80 or tcp.dest_port == 80:
+					sys.stdout.write(
+						f"Source Port: {tcp.src_port} \t Destination Port: {tcp.dest_port} \t Sequence: {tcp.sequence}\t Acknowledgment: {tcp.acknowledgment}\n\nFlags: \tURG: {tcp.flag_URG} \t ACK: {tcp.flag_ACK} \t PSH: {tcp.flag_PSH} \t RST: {tcp.flag_RST} \t SYN: {tcp.flag_SYN} \t FIN:{tcp.flag_FIN}\n{sep1}\n"
+					)
+					if tcp.src_port == 80 or tcp.dest_port == 80:
+						if len(tcp.data) > 0:
 							try:
-								sys.stdout.write("TCP data:\n{}\n{}\n".format(tcp.data.decode('utf-8'),sep1))
+								sys.stdout.write(f"TCP data:\n{tcp.data.decode('utf-8')}\n{sep1}\n")
 							except UnicodeDecodeError:
 								pass
-							
-				# UDP				
+
 				elif ipv4.proto == 17:
 					udp = UDP(ipv4.data)
-					sys.stdout.write("Source Port: {} \t Destination Port: {} \t Length: {} \t Checksum: {}\n{}\n ".format(udp.src_port, udp.dest_port, udp.length,udp.checksum,sep1))
+					sys.stdout.write(
+						f"Source Port: {udp.src_port} \t Destination Port: {udp.dest_port} \t Length: {udp.length} \t Checksum: {udp.checksum}\n{sep1}\n "
+					)
 					try:
-						sys.stdout.write("UDP data:\n{}\n{}\n".format(udp.data.decode('utf-8'),sep1))
+						sys.stdout.write(f"UDP data:\n{udp.data.decode('utf-8')}\n{sep1}\n")
 					except UnicodeDecodeError:
 						pass
 
 				else:
 					try:
-						sys.stdout.write("IPv4 data:\n{}\n{}\n".format(ipv4.data.decode('utf-8'),sep1))
+						sys.stdout.write(f"IPv4 data:\n{ipv4.data.decode('utf-8')}\n{sep1}\n")
 					except UnicodeDecodeError:
 						pass
 
 			else:
 				try:
-					sys.stdout.write("Ethernet data:\n{}\n{}\n".format(eth.data.decode('utf-8'),sep1))
+					sys.stdout.write(f"Ethernet data:\n{eth.data.decode('utf-8')}\n{sep1}\n")
 				except UnicodeDecodeError:
 					pass
 
