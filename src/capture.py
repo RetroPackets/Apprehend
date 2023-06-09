@@ -119,19 +119,16 @@ def create_socket():
     try:
         if os.name=='nt':
             conn = socket.socket(socket.AF_INET,socket.SOCK_RAW,socket.ntohs(0x0003))
-            pcap = Pcap('capture.pcap')
-
         else:
-            conn = socket.socket(socket.AF_PACKET,socket.SOCK_RAW,socket.ntohs(0x0003))      
-            pcap = Pcap('capture.pcap')
-        
+            conn = socket.socket(socket.AF_PACKET,socket.SOCK_RAW,socket.ntohs(0x0003))
+        pcap = Pcap('capture.pcap')
+
         return conn,pcap
 
     except Pcap.errormsg:
 
-        errorlog = open('errorlog.txt', 'a')
-        errorlog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' Socket creation failed. Code: ' + str(errormsg[0]) + 'Message ' + errormsg[1] + '\n')
-        errorlog.close()
+        with open('errorlog.txt', 'a') as errorlog:
+            errorlog.write(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ' Socket creation failed. Code: ' + str(errormsg[0]) + 'Message ' + errormsg[1] + '\n')
         sys.exit()
 
 
